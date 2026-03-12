@@ -25,7 +25,7 @@ export default function AdminPage() {
   const [showSuccess, setShowSuccess] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const ADMIN_PASSWORD = 'admin123';
+  const ADMIN_PASSWORD = 'Nn@123123';
 
   useEffect(() => {
     const authenticated = sessionStorage.getItem('admin_authenticated');
