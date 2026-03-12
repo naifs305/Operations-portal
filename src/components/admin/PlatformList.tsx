@@ -1,115 +1,69 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { Platform } from '@/types/platform';
-import Button from '@/components/ui/Button';
-import PlatformForm from './PlatformForm';
-import { generateId } from '@/lib/helpers';
+import { Platform } from "@/types"
 
-interface PlatformListProps {
-  platforms: Platform[];
-  setPlatforms: (platforms: Platform[]) => void;
+interface Props{
+
+platforms:Platform[]
+
+onDelete:(id:string)=>void
+
+onEdit:(platform:Platform)=>void
+
 }
 
-export default function PlatformList({ platforms, setPlatforms }: PlatformListProps) {
-  const [showForm, setShowForm] = useState(false);
-  const [editingPlatform, setEditingPlatform] = useState<Platform | null>(null);
+export default function PlatformList({platforms,onDelete,onEdit}:Props){
 
-  function handleAdd() {
-    setEditingPlatform(null);
-    setShowForm(true);
-  }
+return(
 
-  function handleEdit(platform: Platform) {
-    setEditingPlatform(platform);
-    setShowForm(true);
-  }
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-  function handleDelete(id: string) {
-    const updated = platforms.filter((p) => p.id !== id);
-    setPlatforms(updated);
-  }
+{platforms.map((p)=>(
 
-  function handleSave(data: Omit<Platform, 'id'>) {
-    if (editingPlatform) {
-      const updated = platforms.map((p) =>
-        p.id === editingPlatform.id ? { ...p, ...data } : p
-      );
-      setPlatforms(updated);
-    } else {
-      const newPlatform: Platform = {
-        id: generateId(),
-        ...data,
-      };
-      setPlatforms([...platforms, newPlatform]);
-    }
+<div key={p.id} className="border p-4 rounded">
 
-    setShowForm(false);
-    setEditingPlatform(null);
-  }
+<div className="flex items-center gap-3">
 
-  return (
-    <div className="space-y-6">
+<img src={p.icon} className="w-8 h-8"/>
 
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">إدارة المنصات</h2>
+<h3 className="font-bold">{p.name}</h3>
 
-        <Button onClick={handleAdd}>
-          إضافة منصة
-        </Button>
-      </div>
+</div>
 
-      {showForm && (
-        <PlatformForm
-          initialData={editingPlatform}
-          onSave={handleSave}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingPlatform(null);
-          }}
-        />
-      )}
+<p className="text-sm text-gray-500 mt-2">
 
-      <div className="grid gap-4">
+{p.description}
 
-        {platforms.map((platform) => (
-          <div
-            key={platform.id}
-            className="flex items-center justify-between border rounded-lg p-4"
-          >
-            <div className="flex items-center gap-4">
-              <img
-                src={platform.icon}
-                alt={platform.name}
-                className="w-12 h-12 object-contain"
-              />
+</p>
 
-              <div>
-                <div className="font-semibold">{platform.name}</div>
-                <div className="text-sm text-gray-500">{platform.url}</div>
-              </div>
-            </div>
+<div className="flex gap-3 mt-4">
 
-            <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => handleEdit(platform)}
-              >
-                تعديل
-              </Button>
+<button
+className="bg-blue-600 text-white px-3 py-1"
+onClick={()=>onEdit(p)}
+>
 
-              <Button
-                variant="danger"
-                onClick={() => handleDelete(platform.id)}
-              >
-                حذف
-              </Button>
-            </div>
-          </div>
-        ))}
+تعديل
 
-      </div>
+</button>
 
-    </div>
-  );
+<button
+className="bg-red-600 text-white px-3 py-1"
+onClick={()=>onDelete(p.id)}
+>
+
+حذف
+
+</button>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+)
+
 }

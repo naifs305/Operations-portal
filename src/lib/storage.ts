@@ -1,80 +1,49 @@
-import { Platform, PortalData } from '@/types';
-import { defaultPlatforms } from '@/data/platforms';
+import { Platform } from "@/types"
 
-const STORAGE_KEY = 'training_portal_data';
-const VISIT_COUNT_KEY = 'training_portal_visits';
-
-function cloneDefaults(): Platform[] {
-  return [...defaultPlatforms].map((item) => ({ ...item })).sort((a, b) => a.order - b.order);
-}
+const STORAGE_KEY = "training-platforms"
 
 export function getPlatforms(): Platform[] {
-  if (typeof window === 'undefined') {
-    return cloneDefaults();
-  }
 
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const data: PortalData = JSON.parse(stored);
-      return [...data.platforms].sort((a, b) => a.order - b.order);
-    }
-  } catch (error) {
-    console.error('Error loading platforms:', error);
-  }
+if (typeof window === "undefined") return []
 
-  return cloneDefaults();
+const stored = localStorage.getItem(STORAGE_KEY)
+
+if (!stored) return []
+
+return JSON.parse(stored)
+
 }
 
-export function savePlatforms(platforms: Platform[]): void {
-  if (typeof window === 'undefined') return;
+export function savePlatforms(platforms: Platform[]) {
 
-  const normalized = [...platforms]
-    .sort((a, b) => a.order - b.order)
-    .map((platform, index) => ({ ...platform, order: index + 1 }));
+localStorage.setItem(STORAGE_KEY, JSON.stringify(platforms))
 
-  const data: PortalData = {
-    platforms: normalized,
-    lastUpdated: new Date().toISOString()
-  };
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-export function exportData(): string {
-  const data: PortalData = {
-    platforms: getPlatforms(),
-    lastUpdated: new Date().toISOString()
-  };
+export function addPlatform(platform: Platform) {
 
-  return JSON.stringify(data, null, 2);
+const platforms = getPlatforms()
+
+platforms.push(platform)
+
+savePlatforms(platforms)
+
 }
 
-export function importData(jsonString: string): boolean {
-  try {
-    const data: PortalData = JSON.parse(jsonString);
-    if (!Array.isArray(data.platforms)) return false;
-    savePlatforms(data.platforms);
-    return true;
-  } catch (error) {
-    console.error('Error importing data:', error);
-    return false;
-  }
+export function updatePlatform(updated: Platform) {
+
+const platforms = getPlatforms().map((p) =>
+p.id === updated.id ? updated : p
+)
+
+savePlatforms(platforms)
+
 }
 
-export function resetToDefault(): void {
-  savePlatforms(cloneDefaults());
-}
+export function deletePlatform(id: string) {
 
-export function getVisitCount(): number {
-  if (typeof window === 'undefined') return 0;
-  const count = localStorage.getItem(VISIT_COUNT_KEY);
-  return count ? parseInt(count, 10) || 0 : 0;
-}
+const platforms = getPlatforms().filter((p) => p.id !== id)
 
-export function incrementVisitCount(): number {
-  if (typeof window === 'undefined') return 0;
-  const next = getVisitCount() + 1;
-  localStorage.setItem(VISIT_COUNT_KEY, String(next));
-  return next;
+savePlatforms(platforms)
+
 }
