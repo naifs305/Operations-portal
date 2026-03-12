@@ -1,13 +1,8 @@
 export interface Platform {
-
-id: string
-
-name: string
-
-description: string
-
-url: string
-
-icon: string
-
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  icon: string;
+  visible?: boolean;
 }

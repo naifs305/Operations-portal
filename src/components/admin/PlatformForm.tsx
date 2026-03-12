@@ -1,133 +1,104 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Platform } from "@/types"
+import { ChangeEvent, useEffect, useState } from 'react';
+import { Platform } from '@/types';
 
 interface Props {
-
-onSave:(platform:Platform)=>void
-
-platform?:Platform
-
+  onSave: (platform: Platform) => void;
+  platform?: Platform;
 }
 
-export default function PlatformForm({onSave,platform}:Props){
-
-const [form,setForm]=useState<Platform>(
-
-platform || {
-
-id:Date.now().toString(),
-
-name:"",
-
-description:"",
-
-url:"",
-
-icon:""
-
+function createEmptyPlatform(): Platform {
+  return {
+    id: Date.now().toString(),
+    name: '',
+    description: '',
+    url: '',
+    icon: '',
+    visible: true
+  };
 }
 
-)
+export default function PlatformForm({ onSave, platform }: Props) {
+  const [form, setForm] = useState<Platform>(platform || createEmptyPlatform());
 
-const handleImage=(e:any)=>{
+  useEffect(() => {
+    if (platform) setForm(platform);
+    else setForm(createEmptyPlatform());
+  }, [platform]);
 
-const file=e.target.files?.[0]
+  const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-if(!file) return
+    const reader = new FileReader();
+    reader.onloadend = () => setForm((prev) => ({ ...prev, icon: reader.result as string }));
+    reader.readAsDataURL(file);
+  };
 
-const reader=new FileReader()
+  const handleSave = () => {
+    if (!form.name.trim() || !form.description.trim() || !form.url.trim()) return;
+    onSave({
+      ...form,
+      name: form.name.trim(),
+      description: form.description.trim(),
+      url: form.url.trim()
+    });
+    if (!platform) setForm(createEmptyPlatform());
+  };
 
-reader.onloadend=()=>{
+  return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold text-[#5b6f8a]">{platform ? 'تعديل منصة' : 'إضافة منصة جديدة'}</h2>
 
-setForm({...form,icon:reader.result as string})
+      <input
+        className="w-full rounded-md border border-[#d6d7d4] px-4 py-3 outline-none"
+        placeholder="اسم المنصة"
+        value={form.name}
+        onChange={(e) => setForm({ ...form, name: e.target.value })}
+      />
 
-}
+      <textarea
+        className="min-h-[110px] w-full rounded-md border border-[#d6d7d4] px-4 py-3 outline-none"
+        placeholder="وصف المنصة"
+        value={form.description}
+        onChange={(e) => setForm({ ...form, description: e.target.value })}
+      />
 
-reader.readAsDataURL(file)
+      <input
+        className="w-full rounded-md border border-[#d6d7d4] px-4 py-3 outline-none"
+        placeholder="رابط المنصة"
+        value={form.url}
+        onChange={(e) => setForm({ ...form, url: e.target.value })}
+      />
 
-}
+      <select
+        className="w-full rounded-md border border-[#d6d7d4] px-4 py-3 outline-none"
+        value={form.icon}
+        onChange={(e) => setForm({ ...form, icon: e.target.value })}
+      >
+        <option value="">اختر أيقونة</option>
+        <option value="/icons/training.svg">التدريب</option>
+        <option value="/icons/reports.svg">التقارير</option>
+        <option value="/icons/students.svg">المتدربين</option>
+        <option value="/icons/trainers.svg">المدربين</option>
+        <option value="/icons/certificate.svg">الشهادات</option>
+        <option value="/icons/attendance.svg">الحضور</option>
+        <option value="/icons/schedule.svg">الجدولة</option>
+        <option value="/icons/evaluation.svg">التقييم</option>
+      </select>
 
-return(
+      <input type="file" accept="image/*" onChange={handleImage} />
 
-<div className="space-y-4">
+      {form.icon ? (
+        <div className="rounded-md border border-[#e5e7eb] p-3">
+          <img src={form.icon} alt="preview" className="h-16 w-16 object-contain" />
+        </div>
+      ) : null}
 
-<input
-
-className="border p-2 w-full"
-
-placeholder="اسم المنصة"
-
-value={form.name}
-
-onChange={(e)=>setForm({...form,name:e.target.value})}
-
-/>
-
-<input
-
-className="border p-2 w-full"
-
-placeholder="وصف المنصة"
-
-value={form.description}
-
-onChange={(e)=>setForm({...form,description:e.target.value})}
-
-/>
-
-<input
-
-className="border p-2 w-full"
-
-placeholder="رابط المنصة"
-
-value={form.url}
-
-onChange={(e)=>setForm({...form,url:e.target.value})}
-
-/>
-
-<select
-
-className="border p-2 w-full"
-
-value={form.icon}
-
-onChange={(e)=>setForm({...form,icon:e.target.value})}
-
->
-
-<option value="">اختر ايقونة</option>
-
-<option value="/icons/training.svg">التدريب</option>
-<option value="/icons/reports.svg">التقارير</option>
-<option value="/icons/students.svg">المتدربين</option>
-<option value="/icons/trainers.svg">المدربين</option>
-<option value="/icons/certificate.svg">الشهادات</option>
-<option value="/icons/attendance.svg">الحضور</option>
-<option value="/icons/schedule.svg">الجدولة</option>
-<option value="/icons/evaluation.svg">التقييم</option>
-
-</select>
-
-<input type="file" accept="image/*" onChange={handleImage}/>
-
-<button
-
-className="bg-teal-700 text-white px-4 py-2"
-
-onClick={()=>onSave(form)}
-
->
-
-حفظ المنصة
-
-</button>
-
-</div>
-
-)
-
+      <button className="w-full rounded-md bg-[#00a6a6] px-4 py-3 text-white" onClick={handleSave}>
+        {platform ? 'حفظ التعديلات' : 'حفظ المنصة'}
+      </button>
+    </div>
+  );
 }
