@@ -28,7 +28,7 @@ export default function HomePage() {
 
           <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-semibold text-[#00a6a6] sm:text-4xl">مزودي الخدمات</h1>
+              <h1 className="text-3xl font-semibold text-[#00a6a6] sm:text-4xl"
             </div>
 
             {isLoading ? (
