@@ -10,7 +10,8 @@ export default function PlatformCard({
   platform: Platform;
   index: number;
 }) {
-  const image = platform.icon?.trim() || 'https://api.iconify.design/mdi:web.svg?color=%23016564';
+  const image =
+    platform.icon?.trim() || 'https://api.iconify.design/mdi:web.svg?color=%23016564';
   const visits = getPlatformVisits();
   const visitCount = visits[platform.id] || 0;
   const delayClass = `delay-${Math.min(index + 1, 12)}`;
@@ -32,8 +33,8 @@ export default function PlatformCard({
         <Image
           src={image}
           alt=""
-          width={40}
-          height={40}
+          width={52}
+          height={52}
           className="object-contain"
           unoptimized
         />
