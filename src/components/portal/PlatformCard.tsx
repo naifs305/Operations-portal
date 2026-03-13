@@ -33,9 +33,9 @@ export default function PlatformCard({
         <Image
           src={image}
           alt=""
-          width={58}
-          height={58}
-          className="object-contain"
+          width={52}
+          height={52}
+          className="object-contain sm:h-[58px] sm:w-[58px]"
           unoptimized
         />
       </div>
@@ -45,8 +45,8 @@ export default function PlatformCard({
       {platform.description ? <div className="card-desc">{platform.description}</div> : null}
 
       <div className="card-counter">
-        <Eye size={14} />
         <span>{visitCount.toLocaleString('ar-SA')}</span>
+        <Eye size={14} />
         زيارة
       </div>
     </a>

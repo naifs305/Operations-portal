@@ -17,15 +17,15 @@ export default function PlatformsGrid({
     );
   }
 
-  const gridClassMap: Record<2 | 3 | 4 | 5, string> = {
-    2: 'grid-cols-2',
-    3: 'grid-cols-2 md:grid-cols-3',
-    4: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
-    5: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-5',
+  const desktopGridClassMap: Record<2 | 3 | 4 | 5, string> = {
+    2: 'md:grid-cols-2',
+    3: 'md:grid-cols-3',
+    4: 'md:grid-cols-3 lg:grid-cols-4',
+    5: 'md:grid-cols-3 lg:grid-cols-5',
   };
 
   return (
-    <div className={`grid gap-4 sm:gap-5 md:gap-6 ${gridClassMap[columns]}`}>
+    <div className={`grid grid-cols-2 gap-4 sm:gap-5 md:gap-6 ${desktopGridClassMap[columns]}`}>
       {platforms.map((platform, index) => (
         <PlatformCard key={platform.id} platform={platform} index={index} />
       ))}
