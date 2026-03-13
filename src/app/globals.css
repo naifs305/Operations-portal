@@ -4,19 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 html {
   direction: rtl;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
+  overflow-x: hidden;
   font-family: 'Cairo', sans-serif;
-  background: #f5f7f8;
-  color: #334155;
+  background: #f8f9f9;
+  color: #1f2937;
 }
 
 a {
@@ -29,4 +34,23 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+select,
+textarea,
+button {
+  border-radius: 0;
+}
+
+textarea {
+  resize: vertical;
 }

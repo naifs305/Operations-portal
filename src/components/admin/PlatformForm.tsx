@@ -58,71 +58,49 @@ export default function PlatformForm({ onSave, platform }: Props) {
   return (
     <div className="space-y-4">
       <input
-        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
+        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 text-sm outline-none focus:border-[#016564]"
         placeholder="اسم المنصة"
         value={form.name}
         onChange={(e) => setForm({ ...form, name: e.target.value })}
       />
 
       <textarea
-        className="min-h-[120px] w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
-        placeholder="وصف المنصة"
+        className="min-h-[110px] w-full rounded-xl border border-[#d6d7d4] px-4 py-3 text-sm outline-none focus:border-[#016564]"
+        placeholder="وصف مختصر"
         value={form.description}
         onChange={(e) => setForm({ ...form, description: e.target.value })}
       />
 
       <input
-        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
+        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 text-sm outline-none focus:border-[#016564]"
         placeholder="رابط المنصة"
         value={form.url}
         onChange={(e) => setForm({ ...form, url: e.target.value })}
       />
 
-      <select
-        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
-        value={form.icon.startsWith('/icons/') ? form.icon : ''}
-        onChange={(e) => setForm({ ...form, icon: e.target.value })}
-      >
-        <option value="">اختر أيقونة جاهزة</option>
-        <option value="/icons/training.svg">التدريب</option>
-        <option value="/icons/reports.svg">التقارير</option>
-        <option value="/icons/students.svg">المتدربين</option>
-        <option value="/icons/trainers.svg">المدربين</option>
-        <option value="/icons/certificate.svg">الشهادات</option>
-        <option value="/icons/attendance.svg">الحضور</option>
-        <option value="/icons/schedule.svg">الجدولة</option>
-        <option value="/icons/evaluation.svg">التقييم</option>
-      </select>
-
       <input
-        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
-        placeholder="رابط الصورة أو الأيقونة (اختياري)"
-        value={form.icon.startsWith('/icons/') ? '' : form.icon}
+        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 text-sm outline-none focus:border-[#016564]"
+        placeholder="رابط الأيقونة أو الصورة"
+        value={form.icon}
         onChange={(e) => setForm({ ...form, icon: e.target.value })}
       />
 
-      {form.icon ? (
-        <div className="rounded-xl border border-[#d6d7d4] bg-[#f8f9f9] p-3">
-          <p className="mb-2 text-sm font-bold text-[#016564]">معاينة الأيقونة</p>
-          <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border border-[#d6d7d4] bg-white p-2">
-            <img
-              src={form.icon}
-              alt="preview"
-              className="max-h-full max-w-full object-contain"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          </div>
-        </div>
-      ) : null}
+      <label className="flex items-center justify-between rounded-xl border border-[#d6d7d4] px-4 py-3">
+        <span className="text-sm font-medium text-[#016564]">إظهار المنصة</span>
+        <input
+          type="checkbox"
+          checked={form.visible !== false}
+          onChange={(e) => setForm({ ...form, visible: e.target.checked })}
+          className="h-4 w-4 accent-[#016564]"
+        />
+      </label>
 
       <button
         type="button"
         onClick={handleSave}
-        className="w-full rounded-xl bg-[#016564] px-4 py-3 font-bold text-white hover:bg-[#014b4a]"
+        className="w-full rounded-xl bg-[#016564] px-4 py-3 font-bold text-white transition hover:bg-[#014b4a]"
       >
-        {platform ? 'حفظ التعديلات' : 'حفظ المنصة'}
+        {platform ? 'حفظ التعديل' : 'حفظ المنصة'}
       </button>
     </div>
   );

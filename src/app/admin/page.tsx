@@ -90,14 +90,15 @@ export default function AdminPage() {
       <div className="min-h-screen overflow-x-hidden bg-[#f8f9f9]">
         <Header isAdmin />
 
-        <main className="mx-auto flex min-h-[calc(100vh-160px)] max-w-7xl items-center justify-center px-4 py-8">
-          <div className="w-full max-w-md rounded-2xl border border-[#d6d7d4] bg-white p-6 shadow-sm">
-            <h1 className="mb-2 text-2xl font-bold text-[#016564]">تسجيل دخول الإدارة</h1>
-            <p className="mb-4 text-sm text-[#6b7280]">أدخل كلمة المرور للوصول إلى لوحة الإدارة</p>
+        <main className="mx-auto flex min-h-[calc(100vh-150px)] max-w-7xl items-center justify-center px-4 py-8">
+          <div className="w-full max-w-sm rounded-2xl border border-[#d6d7d4] bg-white p-6 shadow-sm">
+            <h1 className="mb-2 text-center text-2xl font-bold text-[#016564]">
+              تسجيل دخول الإدارة
+            </h1>
 
             <input
               type="password"
-              className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
+              className="mt-5 w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
               placeholder="كلمة المرور"
               value={password}
               onChange={(e) => {
@@ -114,7 +115,7 @@ export default function AdminPage() {
             <button
               type="button"
               onClick={login}
-              className="mt-4 w-full rounded-xl bg-[#016564] px-4 py-3 font-bold text-white hover:bg-[#014b4a]"
+              className="mt-4 w-full rounded-xl bg-[#016564] px-4 py-3 font-bold text-white transition hover:bg-[#014b4a]"
             >
               دخول
             </button>
@@ -131,10 +132,10 @@ export default function AdminPage() {
       <Header isAdmin />
 
       <main className="mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold text-[#016564]">إدارة المنصات</h1>
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-2xl font-bold text-[#016564]">إدارة المنصات</h1>
 
-          <div className="rounded-xl border border-[#d6d7d4] bg-white px-4 py-2 text-sm text-[#374151]">
+          <div className="rounded-xl border border-[#d6d7d4] bg-white px-4 py-2 text-sm text-[#5f6f86]">
             إجمالي المنصات: <span className="font-bold text-[#016564]">{platforms.length}</span>
           </div>
         </div>
@@ -145,20 +146,16 @@ export default function AdminPage() {
           </div>
         ) : null}
 
-        <div className="grid gap-6 lg:grid-cols-[420px_minmax(0,1fr)]">
-          <section className="rounded-2xl border border-[#d6d7d4] bg-white p-6 shadow-sm">
-            <h2 className="mb-1 text-xl font-bold text-[#016564]">
-              {editingPlatform ? 'تعديل منصة' : 'إضافة منصة جديدة'}
+        <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+          <section className="rounded-2xl border border-[#d6d7d4] bg-white p-5 shadow-sm">
+            <h2 className="mb-1 text-lg font-bold text-[#016564]">
+              {editingPlatform ? 'تعديل منصة' : 'إضافة منصة'}
             </h2>
-
-            <p className="mb-4 text-sm text-[#6b7280]">
-              {editingPlatform ? 'عدّل بيانات المنصة ثم احفظ التغييرات' : 'أدخل بيانات المنصة ثم احفظها'}
-            </p>
 
             <PlatformForm onSave={handleSavePlatform} platform={editingPlatform} />
           </section>
 
-          <section className="rounded-2xl border border-[#d6d7d4] bg-white p-6 shadow-sm">
+          <section className="min-w-0 rounded-2xl border border-[#d6d7d4] bg-white p-5 shadow-sm">
             <PlatformList
               platforms={platforms}
               onDelete={handleDeletePlatform}
