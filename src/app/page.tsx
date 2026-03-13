@@ -33,7 +33,7 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col bg-[var(--background)]">
       <Header isAdmin={false} />
 
-      <main className="flex-1 px-6 pb-12 pt-0 md:px-10 md:pb-14 md:pt-0">
+      <main className="flex-1 px-6 pb-12 pt-6 md:px-10 md:pb-14 md:pt-7">
         <div className="mx-auto max-w-[1400px]">
           <div className="mb-8 text-center">
             <h1 className="mb-1 text-[24px] font-bold text-[var(--text)] md:text-[27px]">
