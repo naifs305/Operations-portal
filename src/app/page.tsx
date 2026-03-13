@@ -4,56 +4,51 @@ import { useEffect, useState } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import PlatformsGrid from '@/components/portal/PlatformsGrid';
-import { Platform } from '@/types';
-import { getPlatforms, seedDefaultPlatforms } from '@/lib/storage';
+import { Platform, PortalSettings } from '@/types';
+import {
+  getPlatforms,
+  seedDefaultPlatforms,
+  incrementPortalVisit,
+  getPortalVisits,
+  getPortalSettings,
+  seedPortalSettings,
+} from '@/lib/storage';
 
 export default function HomePage() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [visits, setVisits] = useState(0);
+  const [settings, setSettings] = useState<PortalSettings>({ columns: 4 });
 
   useEffect(() => {
     seedDefaultPlatforms();
-    const loadedPlatforms = getPlatforms();
-    setPlatforms(loadedPlatforms.filter((p) => p.visible !== false));
-    setIsLoading(false);
+    seedPortalSettings();
+
+    setPlatforms(getPlatforms().filter((p) => p.visible !== false));
+    setSettings(getPortalSettings());
+    incrementPortalVisit();
+    setVisits(getPortalVisits());
   }, []);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#f8f9f9] text-[#1f2937]">
+    <div className="flex min-h-screen flex-col bg-[var(--background)]">
       <Header isAdmin={false} />
 
-      <main className="overflow-x-hidden">
-        <section className="relative overflow-hidden border-t border-[#d6d7d4] bg-[#f1f3f2]">
-          <div className="absolute inset-0 opacity-[0.16] [background-image:radial-gradient(#d6d7d4_1.1px,transparent_1.1px)] [background-size:18px_18px]" />
-
-          <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold text-[#016564] sm:text-4xl">
-                بوابة إدارة عمليات التدريب
-              </h1>
-            </div>
-
-            {isLoading ? (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-3xl border border-[#d6d7d4] bg-white p-6 shadow-sm"
-                  >
-                    <div className="mx-auto mb-5 h-16 w-16 animate-pulse rounded-2xl bg-[#e5e7eb]" />
-                    <div className="mx-auto mb-3 h-5 w-3/4 animate-pulse rounded bg-[#e5e7eb]" />
-                    <div className="mx-auto h-4 w-2/3 animate-pulse rounded bg-[#eef2f3]" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <PlatformsGrid platforms={platforms} />
-            )}
+      <main className="flex-1 px-6 py-10">
+        <div className="mx-auto max-w-[900px]">
+          <div className="mb-9 text-center">
+            <h1 className="mb-2 text-[26px] font-bold text-[var(--text)] md:text-[30px]">
+              المنصات والأنظمة
+            </h1>
+            <p className="text-[15px] text-[var(--text-secondary)]">
+              تصفح المنصات والأنظمة المتاحة في إدارة عمليات التدريب
+            </p>
           </div>
-        </section>
+
+          <PlatformsGrid platforms={platforms} columns={settings.columns} />
+        </div>
       </main>
 
-      <Footer />
+      <Footer visits={visits} />
     </div>
   );
 }

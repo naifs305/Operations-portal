@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { Home, Settings } from 'lucide-react';
 
 interface HeaderProps {
   isAdmin?: boolean;
@@ -9,50 +10,55 @@ interface HeaderProps {
 
 export default function Header({ isAdmin = false }: HeaderProps) {
   return (
-    <header className="border-b border-[#d6d7d4] bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <nav className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <Link
-            href="/"
-            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-              !isAdmin
-                ? 'border border-[#016564] bg-[#016564] text-white'
-                : 'text-[#016564] hover:bg-[#f3f6f6]'
-            }`}
-          >
-            الرئيسية
-          </Link>
-
-          <Link
-            href="/admin"
-            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-              isAdmin
-                ? 'border border-[#016564] bg-[#016564] text-white'
-                : 'text-[#016564] hover:bg-[#f3f6f6]'
-            }`}
-          >
-            الإدارة
-          </Link>
-        </nav>
-
-        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-          <div className="min-w-0 text-left">
-            <h1 className="truncate text-base font-bold text-[#016564] sm:text-lg lg:text-xl">
-              بوابة إدارة عمليات التدريب
-            </h1>
-          </div>
-
-          <div className="relative h-14 w-24 shrink-0 sm:h-16 sm:w-28 lg:h-18 lg:w-32">
+    <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface)]">
+      <div className="mx-auto flex h-20 max-w-[1100px] items-center justify-between px-6 md:h-[88px]">
+        <Link href="/" className="flex items-center gap-4">
+          <div className="relative h-[58px] w-[58px] shrink-0 md:h-16 md:w-16">
             <Image
               src="https://nauss.edu.sa/Style%20Library/ar-sa/Styles/images/home/Logo.svg"
-              alt="شعار جامعة نايف العربية للعلوم الأمنية"
+              alt="شعار جامعة نايف"
               fill
               className="object-contain"
               priority
               unoptimized
             />
           </div>
-        </div>
+
+          <div className="leading-[1.4]">
+            <div className="text-[17px] font-bold text-[var(--primary)] md:text-[19px]">
+              جامعة نايف العربية للعلوم الأمنية
+            </div>
+            <div className="text-sm text-[var(--text-secondary)] md:text-[15px]">
+              إدارة عمليات التدريب
+            </div>
+          </div>
+        </Link>
+
+        <nav className="flex items-center gap-2">
+          <Link
+            href="/"
+            aria-label="الرئيسية"
+            className={`flex h-[46px] w-[46px] items-center justify-center rounded-[var(--radius)] border border-[var(--border)] transition-all ${
+              !isAdmin
+                ? 'border-[var(--primary)] bg-[var(--primary)] text-white'
+                : 'bg-transparent text-[var(--text-secondary)] hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white'
+            }`}
+          >
+            <Home size={22} />
+          </Link>
+
+          <Link
+            href="/admin"
+            aria-label="لوحة الإدارة"
+            className={`flex h-[46px] w-[46px] items-center justify-center rounded-[var(--radius)] border border-[var(--border)] transition-all ${
+              isAdmin
+                ? 'border-[var(--primary)] bg-[var(--primary)] text-white'
+                : 'bg-transparent text-[var(--text-secondary)] hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white'
+            }`}
+          >
+            <Settings size={22} />
+          </Link>
+        </nav>
       </div>
     </header>
   );

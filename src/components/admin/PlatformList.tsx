@@ -1,79 +1,132 @@
 'use client';
 
 import Image from 'next/image';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, ExternalLink, GripHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { Platform } from '@/types';
+import { getPlatformVisits } from '@/lib/storage';
 
 interface PlatformListProps {
   platforms: Platform[];
   onEdit: (platform: Platform) => void;
   onDelete: (id: string) => void;
+  onMove?: (draggedId: string, targetId: string) => void;
+  onToggleVisibility?: (id: string) => void;
 }
 
 export default function PlatformList({
   platforms,
   onEdit,
   onDelete,
+  onMove,
+  onToggleVisibility,
 }: PlatformListProps) {
+  const visits = getPlatformVisits();
+
   if (!platforms.length) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#d6d7d4] bg-white px-6 py-10 text-center">
-        <h3 className="text-base font-bold text-[#016564]">لا توجد منصات</h3>
+      <div className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] px-6 py-[52px] text-center">
+        <h3 className="mb-2 text-[17px] font-semibold text-[var(--text)]">لا توجد منصات</h3>
+        <p className="text-sm text-[var(--text-secondary)]">أضف منصة جديدة للبدء</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-3">
       {platforms.map((platform) => {
-        const imageSrc = platform.icon?.trim() || '/images/platform-placeholder.svg';
+        const image = platform.icon?.trim() || 'https://api.iconify.design/mdi:web.svg?color=%23016564';
+        const visitCount = visits[platform.id] || 0;
 
         return (
           <div
             key={platform.id}
-            className="rounded-2xl border border-[#e3e5e4] bg-white p-4"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', platform.id);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              const draggedId = e.dataTransfer.getData('text/plain');
+              if (draggedId && draggedId !== platform.id && onMove) {
+                onMove(draggedId, platform.id);
+              }
+            }}
+            className="flex items-center gap-[14px] rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] px-[18px] py-4 transition-colors hover:border-[var(--primary)]"
           >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex min-w-0 items-center gap-4">
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-white">
-                  <Image
-                    src={imageSrc}
-                    alt={platform.name}
-                    fill
-                    className="object-contain"
-                    unoptimized
-                  />
-                </div>
+            <div className="cursor-grab text-[var(--text-muted)]">
+              <GripHorizontal size={20} />
+            </div>
 
-                <div className="min-w-0">
-                  <h3 className="truncate text-base font-bold text-[#016564]">
-                    {platform.name}
-                  </h3>
-                  <p className="mt-1 line-clamp-2 text-sm text-[#5f6f86]">
-                    {platform.description}
-                  </p>
-                </div>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius)] border border-[var(--border)] bg-[var(--background)]">
+              <Image
+                src={image}
+                alt=""
+                width={26}
+                height={26}
+                className="object-contain"
+                unoptimized
+              />
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2 text-[15px] font-semibold text-[var(--text)]">
+                <span>{platform.name}</span>
+                {platform.visible === false ? (
+                  <span className="rounded px-2 py-[3px] text-[11px] font-medium text-[#dc2626] bg-[#fef2f2]">
+                    مخفي
+                  </span>
+                ) : null}
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => onEdit(platform)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-[#d6d7d4] px-4 py-2 text-sm font-semibold text-[#016564] transition hover:bg-[#f3f6f6]"
-                >
-                  <Pencil size={16} />
-                  تعديل
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => onDelete(platform.id)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
-                >
-                  <Trash2 size={16} />
-                  حذف
-                </button>
+              <div className="mt-[3px] text-[13px] text-[var(--text-secondary)]">
+                {platform.description || 'بدون وصف'}
               </div>
+
+              <div className="mt-[5px] text-xs font-semibold text-[var(--gold)]">
+                {visitCount.toLocaleString('ar-SA')} زيارة
+              </div>
+            </div>
+
+            <div className="flex items-center gap-[6px]">
+              <button
+                type="button"
+                onClick={() => onToggleVisibility?.(platform.id)}
+                className="flex rounded-md p-[10px] text-[var(--text-muted)] transition-all hover:bg-[var(--background)] hover:text-[var(--primary)]"
+                title={platform.visible === false ? 'إظهار' : 'إخفاء'}
+              >
+                {platform.visible === false ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+
+              <a
+                href={platform.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex rounded-md p-[10px] text-[var(--text-muted)] transition-all hover:bg-[var(--background)] hover:text-[var(--primary)]"
+                title="فتح الرابط"
+              >
+                <ExternalLink size={18} />
+              </a>
+
+              <button
+                type="button"
+                onClick={() => onEdit(platform)}
+                className="flex rounded-md p-[10px] text-[var(--text-muted)] transition-all hover:bg-[var(--background)] hover:text-[var(--primary)]"
+                title="تعديل"
+              >
+                <Pencil size={18} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onDelete(platform.id)}
+                className="flex rounded-md p-[10px] text-[var(--text-muted)] transition-all hover:bg-[#fef2f2] hover:text-[#dc2626]"
+                title="حذف"
+              >
+                <Trash2 size={18} />
+              </button>
             </div>
           </div>
         );

@@ -1,36 +1,52 @@
 import Image from 'next/image';
+import { Eye } from 'lucide-react';
 import { Platform } from '@/types';
+import { incrementPlatformVisit, getPlatformVisits } from '@/lib/storage';
 
-export default function PlatformCard({ platform }: { platform: Platform }) {
-  const imageSrc = platform.icon?.trim() || '/images/platform-placeholder.svg';
+export default function PlatformCard({
+  platform,
+  index,
+}: {
+  platform: Platform;
+  index: number;
+}) {
+  const image = platform.icon?.trim() || 'https://api.iconify.design/mdi:web.svg?color=%23016564';
+  const visits = getPlatformVisits();
+  const visitCount = visits[platform.id] || 0;
+  const delayClass = `delay-${Math.min(index + 1, 12)}`;
+
+  function handleClick() {
+    incrementPlatformVisit(platform.id);
+  }
 
   return (
     <a
       href={platform.url}
       target="_blank"
-      rel="noreferrer"
-      className="group block h-full overflow-hidden rounded-2xl border border-[#e3e5e4] bg-white px-6 py-8 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      rel="noopener noreferrer"
+      onClick={handleClick}
+      aria-label={`فتح ${platform.name}`}
+      className={`platform-card animate-in ${delayClass}`}
     >
-      <div className="flex h-full min-h-[250px] flex-col items-center justify-center">
-        <div className="mb-6 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl bg-white">
-          <div className="relative h-full w-full">
-            <Image
-              src={imageSrc}
-              alt={platform.name}
-              fill
-              className="object-contain"
-              unoptimized
-            />
-          </div>
-        </div>
+      <div className="card-icon-wrap">
+        <Image
+          src={image}
+          alt=""
+          width={40}
+          height={40}
+          className="object-contain"
+          unoptimized
+        />
+      </div>
 
-        <h3 className="text-xl font-normal leading-relaxed text-[#5f6f86] sm:text-[1.65rem]">
-          {platform.name}
-        </h3>
+      <div className="card-title">{platform.name}</div>
 
-        <p className="mt-3 text-lg leading-loose text-[#5f6f86] sm:text-[1.35rem]">
-          {platform.description}
-        </p>
+      {platform.description ? <div className="card-desc">{platform.description}</div> : null}
+
+      <div className="card-counter">
+        <Eye size={14} />
+        <span>{visitCount.toLocaleString('ar-SA')}</span>
+        زيارة
       </div>
     </a>
   );

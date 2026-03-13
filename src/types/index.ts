@@ -6,3 +6,7 @@ export interface Platform {
   icon: string;
   visible?: boolean;
 }
+
+export interface PortalSettings {
+  columns: 2 | 3 | 4 | 5;
+}

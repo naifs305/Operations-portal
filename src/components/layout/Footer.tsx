@@ -1,12 +1,28 @@
 'use client';
 
-export default function Footer() {
+interface FooterProps {
+  visits?: number;
+}
+
+export default function Footer({ visits = 0 }: FooterProps) {
   return (
-    <footer className="border-t border-[#d6d7d4] bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-        <p className="text-center text-sm text-[#8c6968]">
-          جميع الحقوق محفوظة © جامعة نايف العربية للعلوم الأمنية
-        </p>
+    <footer className="mt-auto border-t border-[var(--border)] bg-[var(--surface)] px-6 py-7">
+      <div className="mx-auto flex max-w-[900px] flex-col items-center gap-[10px] text-center sm:flex-row sm:justify-between sm:text-right">
+        <div>
+          <div className="text-[15px] font-semibold text-[var(--primary)]">
+            إدارة عمليات التدريب
+          </div>
+          <div className="text-[13px] text-[var(--text-secondary)]">
+            وكالة التدريب - جامعة نايف العربية للعلوم الأمنية
+          </div>
+        </div>
+
+        <div className="text-[13px] text-[var(--text-muted)]">
+          زيارات البوابة:{' '}
+          <span className="font-semibold text-[var(--text-secondary)]">
+            {visits.toLocaleString('ar-SA')}
+          </span>
+        </div>
       </div>
     </footer>
   );
