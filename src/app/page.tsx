@@ -19,18 +19,14 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f5f7f8] text-gray-900">
+    <div className="min-h-screen overflow-x-hidden bg-[#f5f7f8] text-gray-900">
       <Header isAdmin={false} />
 
-      <main className="relative">
+      <main className="relative overflow-x-hidden">
         <section className="relative overflow-hidden border-t border-[#d6d7d4]/60 bg-[#f5f7f8]">
           <div className="absolute inset-0 opacity-[0.18] [background-image:radial-gradient(#d8dde0_1.2px,transparent_1.2px)] [background-size:18px_18px]" />
 
           <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-semibold text-[#00a6a6] sm:text-4xl"
-            </div>
-
             {isLoading ? (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, i) => (
