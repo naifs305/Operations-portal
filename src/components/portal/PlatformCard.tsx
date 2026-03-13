@@ -33,8 +33,8 @@ export default function PlatformCard({
         <Image
           src={image}
           alt=""
-          width={52}
-          height={52}
+          width={58}
+          height={58}
           className="object-contain"
           unoptimized
         />

@@ -35,11 +35,11 @@ export default function HomePage() {
 
       <main className="flex-1 px-6 py-12 md:px-10 md:py-14">
         <div className="mx-auto max-w-[1400px]">
-          <div className="mb-12 text-center">
-            <h1 className="mb-3 text-[34px] font-bold text-[var(--text)] md:text-[42px]">
+          <div className="mb-10 text-center">
+            <h1 className="mb-2 text-[24px] font-bold text-[var(--text)] md:text-[28px]">
               المنصات والأنظمة
             </h1>
-            <p className="text-[18px] text-[var(--text-secondary)] md:text-[20px]">
+            <p className="text-[14px] text-[var(--text-secondary)] md:text-[16px]">
               تصفح المنصات والأنظمة المتاحة في إدارة عمليات التدريب
             </p>
           </div>
