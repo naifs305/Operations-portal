@@ -9,7 +9,7 @@ const defaultPlatforms: Platform[] = [
     description: 'الدخول إلى التدريب الإلكتروني',
     url: 'https://example.com/training',
     icon: '/icons/training.svg',
-    visible: true
+    visible: true,
   },
   {
     id: '2',
@@ -17,7 +17,7 @@ const defaultPlatforms: Platform[] = [
     description: 'الدخول إلى لوحة التقارير',
     url: 'https://example.com/reports',
     icon: '/icons/reports.svg',
-    visible: true
+    visible: true,
   },
   {
     id: '3',
@@ -25,7 +25,7 @@ const defaultPlatforms: Platform[] = [
     description: 'إدارة بيانات المتدربين',
     url: 'https://example.com/students',
     icon: '/icons/students.svg',
-    visible: true
+    visible: true,
   },
   {
     id: '4',
@@ -33,8 +33,8 @@ const defaultPlatforms: Platform[] = [
     description: 'إصدار ومتابعة الشهادات',
     url: 'https://example.com/certificates',
     icon: '/icons/certificate.svg',
-    visible: true
-  }
+    visible: true,
+  },
 ];
 
 export function getPlatforms(): Platform[] {
@@ -43,19 +43,35 @@ export function getPlatforms(): Platform[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return defaultPlatforms;
-    return JSON.parse(stored) as Platform[];
+
+    const parsed = JSON.parse(stored) as Platform[];
+    return Array.isArray(parsed) ? parsed : defaultPlatforms;
   } catch {
     return defaultPlatforms;
   }
 }
 
-export function savePlatforms(platforms: Platform[]): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(platforms));
+export function savePlatforms(platforms: Platform[]): boolean {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(platforms));
+    return true;
+  } catch (error) {
+    console.error('Failed to save platforms to localStorage: - storage.ts:61', error);
+    return false;
+  }
 }
 
 export function seedDefaultPlatforms(): void {
   if (typeof window === 'undefined') return;
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (!stored) savePlatforms(defaultPlatforms);
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) {
+      savePlatforms(defaultPlatforms);
+    }
+  } catch (error) {
+    console.error('Failed to seed default platforms: - storage.ts:75', error);
+  }
 }
