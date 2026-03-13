@@ -11,24 +11,24 @@ interface HeaderProps {
 export default function Header({ isAdmin = false }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface)]">
-      <div className="mx-auto flex h-[84px] max-w-[1400px] items-center justify-between px-6 md:h-[92px] md:px-10">
+      <div className="mx-auto flex h-[90px] max-w-[1400px] items-center justify-between px-6 md:h-[100px] md:px-10">
         <Link href="/" className="flex items-center gap-4">
-          <div className="relative h-[54px] w-[54px] shrink-0 md:h-[60px] md:w-[60px]">
+          <div className="relative h-[82px] w-[240px] shrink-0 md:h-[90px] md:w-[280px]">
             <Image
               src="https://nauss.edu.sa/Style%20Library/ar-sa/Styles/images/home/Logo.svg"
               alt="شعار جامعة نايف"
               fill
-              className="object-contain"
+              className="object-contain object-right"
               priority
               unoptimized
             />
           </div>
 
-          <div className="leading-[1.3]">
-            <div className="text-[19px] font-bold text-[var(--primary)] md:text-[22px]">
+          <div className="leading-[1.25]">
+            <div className="text-[18px] font-bold text-[var(--primary)] md:text-[21px]">
               جامعة نايف العربية للعلوم الأمنية
             </div>
-            <div className="mt-1 text-[14px] text-[var(--text-secondary)] md:text-[16px]">
+            <div className="mt-1 text-[13px] text-[var(--text-secondary)] md:text-[15px]">
               إدارة عمليات التدريب
             </div>
           </div>
@@ -38,25 +38,25 @@ export default function Header({ isAdmin = false }: HeaderProps) {
           <Link
             href="/"
             aria-label="الرئيسية"
-            className={`flex h-[46px] w-[46px] items-center justify-center rounded-[var(--radius)] border border-[var(--border)] transition-all ${
+            className={`flex h-[44px] w-[44px] items-center justify-center rounded-[var(--radius)] border border-[var(--border)] transition-all ${
               !isAdmin
                 ? 'border-[var(--primary)] bg-[var(--primary)] text-white'
                 : 'bg-transparent text-[var(--text-secondary)] hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white'
             }`}
           >
-            <Home size={21} />
+            <Home size={20} />
           </Link>
 
           <Link
             href="/admin"
             aria-label="لوحة الإدارة"
-            className={`flex h-[46px] w-[46px] items-center justify-center rounded-[var(--radius)] border border-[var(--border)] transition-all ${
+            className={`flex h-[44px] w-[44px] items-center justify-center rounded-[var(--radius)] border border-[var(--border)] transition-all ${
               isAdmin
                 ? 'border-[var(--primary)] bg-[var(--primary)] text-white'
                 : 'bg-transparent text-[var(--text-secondary)] hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white'
             }`}
           >
-            <Settings size={21} />
+            <Settings size={20} />
           </Link>
         </nav>
       </div>
