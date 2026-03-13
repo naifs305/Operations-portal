@@ -33,7 +33,16 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col bg-[var(--background)]">
       <Header isAdmin={false} />
 
-      <main className="flex-1 px-6 pb-12 pt-6 md:px-10 md:pb-14 md:pt-7">
+      <main
+        className="flex-1 px-6 pb-12 pt-6 md:px-10 md:pb-14 md:pt-7"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)), url('https://png.pngtree.com/thumb_back/fh260/background/20210812/pngtree-white-background-gray-dot-gradient-perspective-ripple-shape-business-background-image_760038.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
         <div className="mx-auto max-w-[1400px]">
           <div className="mb-8 text-center">
             <h1 className="mb-1 text-[24px] font-bold text-[var(--text)] md:text-[27px]">
