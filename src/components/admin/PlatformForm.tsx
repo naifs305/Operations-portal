@@ -15,66 +15,81 @@ function createEmptyPlatform(): Platform {
     description: '',
     url: '',
     icon: '',
-    visible: true
   };
 }
 
 export default function PlatformForm({ onSave, platform }: Props) {
-  const [form, setForm] = useState<Platform>(platform || createEmptyPlatform());
+  const [form, setForm] = useState<Platform>(createEmptyPlatform());
 
   useEffect(() => {
-    if (platform) setForm(platform);
-    else setForm(createEmptyPlatform());
+    if (platform) {
+      setForm(platform);
+    } else {
+      setForm(createEmptyPlatform());
+    }
   }, [platform]);
 
-  const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
+  function handleImage(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onloadend = () => setForm((prev) => ({ ...prev, icon: reader.result as string }));
-    reader.readAsDataURL(file);
-  };
 
-  const handleSave = () => {
-    if (!form.name.trim() || !form.description.trim() || !form.url.trim()) return;
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === 'string') {
+        setForm((prev) => ({ ...prev, icon: result }));
+      }
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  function handleSave() {
+    if (!form.name.trim()) return;
+    if (!form.description.trim()) return;
+    if (!form.url.trim()) return;
+
     onSave({
       ...form,
+      id: form.id || Date.now().toString(),
       name: form.name.trim(),
       description: form.description.trim(),
-      url: form.url.trim()
+      url: form.url.trim(),
+      icon: form.icon || '',
     });
-    if (!platform) setForm(createEmptyPlatform());
-  };
+
+    if (!platform) {
+      setForm(createEmptyPlatform());
+    }
+  }
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-[#5b6f8a]">{platform ? 'تعديل منصة' : 'إضافة منصة جديدة'}</h2>
-
       <input
-        className="w-full rounded-md border border-[#d6d7d4] px-4 py-3 outline-none"
+        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
         placeholder="اسم المنصة"
         value={form.name}
         onChange={(e) => setForm({ ...form, name: e.target.value })}
       />
 
       <textarea
-        className="min-h-[110px] w-full rounded-md border border-[#d6d7d4] px-4 py-3 outline-none"
+        className="min-h-[120px] w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
         placeholder="وصف المنصة"
         value={form.description}
         onChange={(e) => setForm({ ...form, description: e.target.value })}
       />
 
       <input
-        className="w-full rounded-md border border-[#d6d7d4] px-4 py-3 outline-none"
+        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
         placeholder="رابط المنصة"
         value={form.url}
         onChange={(e) => setForm({ ...form, url: e.target.value })}
       />
 
       <select
-        className="w-full rounded-md border border-[#d6d7d4] px-4 py-3 outline-none"
-        value={form.icon}
+        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
+        value={form.icon.startsWith('/icons/') ? form.icon : ''}
         onChange={(e) => setForm({ ...form, icon: e.target.value })}
       >
         <option value="">اختر أيقونة</option>
@@ -88,15 +103,27 @@ export default function PlatformForm({ onSave, platform }: Props) {
         <option value="/icons/evaluation.svg">التقييم</option>
       </select>
 
-      <input type="file" accept="image/*" onChange={handleImage} />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImage}
+        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3"
+      />
 
       {form.icon ? (
-        <div className="rounded-md border border-[#e5e7eb] p-3">
-          <img src={form.icon} alt="preview" className="h-16 w-16 object-contain" />
+        <div className="rounded-xl border border-[#d6d7d4] bg-[#f8f9f9] p-3">
+          <p className="mb-2 text-sm font-bold text-[#016564]">معاينة الأيقونة</p>
+          <div className="flex h-20 w-20 items-center justify-center rounded-lg border border-[#d6d7d4] bg-white p-2">
+            <img src={form.icon} alt="preview" className="max-h-full max-w-full object-contain" />
+          </div>
         </div>
       ) : null}
 
-      <button className="w-full rounded-md bg-[#00a6a6] px-4 py-3 text-white" onClick={handleSave}>
+      <button
+        type="button"
+        onClick={handleSave}
+        className="w-full rounded-xl bg-[#016564] px-4 py-3 font-bold text-white hover:bg-[#014b4a]"
+      >
         {platform ? 'حفظ التعديلات' : 'حفظ المنصة'}
       </button>
     </div>
