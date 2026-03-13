@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Platform } from '@/types';
 
 interface Props {
@@ -15,6 +15,7 @@ function createEmptyPlatform(): Platform {
     description: '',
     url: '',
     icon: '',
+    visible: true,
   };
 }
 
@@ -23,27 +24,16 @@ export default function PlatformForm({ onSave, platform }: Props) {
 
   useEffect(() => {
     if (platform) {
-      setForm(platform);
-    } else {
-      setForm(createEmptyPlatform());
+      setForm({
+        ...platform,
+        icon: platform.icon || '',
+        visible: platform.visible !== false,
+      });
+      return;
     }
+
+    setForm(createEmptyPlatform());
   }, [platform]);
-
-  function handleImage(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result === 'string') {
-        setForm((prev) => ({ ...prev, icon: result }));
-      }
-    };
-
-    reader.readAsDataURL(file);
-  }
 
   function handleSave() {
     if (!form.name.trim()) return;
@@ -56,7 +46,8 @@ export default function PlatformForm({ onSave, platform }: Props) {
       name: form.name.trim(),
       description: form.description.trim(),
       url: form.url.trim(),
-      icon: form.icon || '',
+      icon: form.icon.trim(),
+      visible: form.visible !== false,
     });
 
     if (!platform) {
@@ -92,7 +83,7 @@ export default function PlatformForm({ onSave, platform }: Props) {
         value={form.icon.startsWith('/icons/') ? form.icon : ''}
         onChange={(e) => setForm({ ...form, icon: e.target.value })}
       >
-        <option value="">اختر أيقونة</option>
+        <option value="">اختر أيقونة جاهزة</option>
         <option value="/icons/training.svg">التدريب</option>
         <option value="/icons/reports.svg">التقارير</option>
         <option value="/icons/students.svg">المتدربين</option>
@@ -104,17 +95,24 @@ export default function PlatformForm({ onSave, platform }: Props) {
       </select>
 
       <input
-        type="file"
-        accept="image/*"
-        onChange={handleImage}
-        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3"
+        className="w-full rounded-xl border border-[#d6d7d4] px-4 py-3 outline-none focus:border-[#016564]"
+        placeholder="رابط الصورة أو الأيقونة (اختياري)"
+        value={form.icon.startsWith('/icons/') ? '' : form.icon}
+        onChange={(e) => setForm({ ...form, icon: e.target.value })}
       />
 
       {form.icon ? (
         <div className="rounded-xl border border-[#d6d7d4] bg-[#f8f9f9] p-3">
           <p className="mb-2 text-sm font-bold text-[#016564]">معاينة الأيقونة</p>
-          <div className="flex h-20 w-20 items-center justify-center rounded-lg border border-[#d6d7d4] bg-white p-2">
-            <img src={form.icon} alt="preview" className="max-h-full max-w-full object-contain" />
+          <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border border-[#d6d7d4] bg-white p-2">
+            <img
+              src={form.icon}
+              alt="preview"
+              className="max-h-full max-w-full object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
           </div>
         </div>
       ) : null}
