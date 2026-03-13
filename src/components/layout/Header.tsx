@@ -11,9 +11,9 @@ interface HeaderProps {
 export default function Header({ isAdmin = false }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface)]">
-      <div className="mx-auto flex h-[90px] max-w-[1400px] items-center justify-between px-6 md:h-[100px] md:px-10">
+      <div className="mx-auto flex h-[84px] max-w-[1400px] items-center justify-between px-6 md:h-[90px] md:px-10">
         <Link href="/" className="flex items-center gap-4">
-          <div className="relative h-[82px] w-[240px] shrink-0 md:h-[90px] md:w-[280px]">
+          <div className="relative h-[62px] w-[190px] shrink-0 md:h-[68px] md:w-[210px]">
             <Image
               src="https://nauss.edu.sa/Style%20Library/ar-sa/Styles/images/home/Logo.svg"
               alt="شعار جامعة نايف"
@@ -25,10 +25,10 @@ export default function Header({ isAdmin = false }: HeaderProps) {
           </div>
 
           <div className="leading-[1.25]">
-            <div className="text-[18px] font-bold text-[var(--primary)] md:text-[21px]">
+            <div className="text-[18px] font-bold text-[var(--primary)] md:text-[20px]">
               جامعة نايف العربية للعلوم الأمنية
             </div>
-            <div className="mt-1 text-[13px] text-[var(--text-secondary)] md:text-[15px]">
+            <div className="mt-1 text-[13px] text-[var(--text-secondary)] md:text-[14px]">
               إدارة عمليات التدريب
             </div>
           </div>
