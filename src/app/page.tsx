@@ -33,17 +33,19 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col bg-[var(--background)]">
       <Header isAdmin={false} />
 
-      <main
-        className="flex-1 px-4 pb-10 pt-4 sm:px-6 sm:pb-12 sm:pt-5 md:px-10 md:pb-14 md:pt-7"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)), url('https://png.pngtree.com/thumb_back/fh260/background/20210812/pngtree-white-background-gray-dot-gradient-perspective-ripple-shape-business-background-image_760038.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center top',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
-        <div className="mx-auto max-w-[1400px]">
+      <main className="relative flex-1 bg-white px-4 pb-10 pt-4 sm:px-6 sm:pb-12 sm:pt-5 md:bg-transparent md:px-10 md:pb-14 md:pt-7">
+        <div
+          className="absolute inset-0 hidden md:block"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)), url('https://png.pngtree.com/thumb_back/fh260/background/20210812/pngtree-white-background-gray-dot-gradient-perspective-ripple-shape-business-background-image_760038.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+
+        <div className="relative z-10 mx-auto max-w-[1400px]">
           <div className="mb-6 text-center sm:mb-8">
             <h1 className="mb-1 text-[20px] font-bold text-[var(--text)] sm:text-[24px] md:text-[27px]">
               المنصات والأنظمة
