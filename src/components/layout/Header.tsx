@@ -65,4 +65,4 @@ export default function Header({ isAdmin = false }: HeaderProps) {
       </div>
     </header>
   );
-}
+} 
