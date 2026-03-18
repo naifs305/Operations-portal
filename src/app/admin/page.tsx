@@ -30,16 +30,20 @@ export default function AdminPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    seedDefaultPlatforms();
-    seedPortalSettings();
-    setPlatforms(getPlatforms());
-    setSettings(getPortalSettings());
-    setVisits(getPortalVisits());
-  }, []);
+    async function loadData() {
+      await seedDefaultPlatforms();
+      await seedPortalSettings();
 
-  function refreshPlatforms(nextPlatforms?: Platform[]) {
-    setPlatforms(nextPlatforms || getPlatforms());
-  }
+      const loadedPlatforms = await getPlatforms();
+      const loadedSettings = await getPortalSettings();
+
+      setPlatforms(loadedPlatforms);
+      setSettings(loadedSettings);
+      setVisits(getPortalVisits());
+    }
+
+    loadData();
+  }, []);
 
   function login() {
     if (password === ADMIN_PASSWORD) {
@@ -51,7 +55,17 @@ export default function AdminPage() {
     setError('كلمة المرور غير صحيحة');
   }
 
-  function handleSavePlatform(platform: Platform) {
+  async function refreshPlatforms(nextPlatforms?: Platform[]) {
+    if (nextPlatforms) {
+      setPlatforms(nextPlatforms);
+      return;
+    }
+
+    const loadedPlatforms = await getPlatforms();
+    setPlatforms(loadedPlatforms);
+  }
+
+  async function handleSavePlatform(platform: Platform) {
     setSaveError('');
 
     const normalizedPlatform: Platform = {
@@ -70,29 +84,29 @@ export default function AdminPage() {
       ? platforms.map((p) => (p.id === normalizedPlatform.id ? normalizedPlatform : p))
       : [...platforms, normalizedPlatform];
 
-    const saved = savePlatforms(updated);
+    const saved = await savePlatforms(updated);
 
     if (!saved) {
       setSaveError('تعذر حفظ المنصة.');
       return;
     }
 
-    refreshPlatforms(updated);
+    await refreshPlatforms(updated);
     setEditingPlatform(undefined);
   }
 
-  function handleDeletePlatform(id: string) {
+  async function handleDeletePlatform(id: string) {
     setSaveError('');
 
     const updated = platforms.filter((p) => p.id !== id);
-    const saved = savePlatforms(updated);
+    const saved = await savePlatforms(updated);
 
     if (!saved) {
       setSaveError('تعذر حذف المنصة.');
       return;
     }
 
-    refreshPlatforms(updated);
+    await refreshPlatforms(updated);
 
     if (editingPlatform?.id === id) {
       setEditingPlatform(undefined);
@@ -104,21 +118,21 @@ export default function AdminPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function handleToggleVisibility(id: string) {
+  async function handleToggleVisibility(id: string) {
     setSaveError('');
 
     const updated = platforms.map((platform) =>
       platform.id === id ? { ...platform, visible: platform.visible === false } : platform
     );
 
-    const saved = savePlatforms(updated);
+    const saved = await savePlatforms(updated);
 
     if (!saved) {
       setSaveError('تعذر تحديث حالة المنصة.');
       return;
     }
 
-    refreshPlatforms(updated);
+    await refreshPlatforms(updated);
 
     if (editingPlatform?.id === id) {
       const nextEditing = updated.find((platform) => platform.id === id);
@@ -126,7 +140,7 @@ export default function AdminPage() {
     }
   }
 
-  function handleMovePlatform(draggedId: string, targetId: string) {
+  async function handleMovePlatform(draggedId: string, targetId: string) {
     setSaveError('');
 
     const fromIndex = platforms.findIndex((platform) => platform.id === draggedId);
@@ -138,19 +152,19 @@ export default function AdminPage() {
     const [draggedItem] = updated.splice(fromIndex, 1);
     updated.splice(toIndex, 0, draggedItem);
 
-    const saved = savePlatforms(updated);
+    const saved = await savePlatforms(updated);
 
     if (!saved) {
       setSaveError('تعذر تحديث ترتيب المنصات.');
       return;
     }
 
-    refreshPlatforms(updated);
+    await refreshPlatforms(updated);
   }
 
-  function handleColumnsChange(columns: 2 | 3 | 4 | 5) {
+  async function handleColumnsChange(columns: 2 | 3 | 4 | 5) {
     const nextSettings: PortalSettings = { columns };
-    const saved = savePortalSettings(nextSettings);
+    const saved = await savePortalSettings(nextSettings);
 
     if (!saved) {
       setSaveError('تعذر حفظ إعدادات توزيع المنصات.');
@@ -162,10 +176,9 @@ export default function AdminPage() {
   }
 
   function handleExport() {
-    const blob = new Blob(
-      [JSON.stringify({ platforms, settings }, null, 2)],
-      { type: 'application/json' }
-    );
+    const blob = new Blob([JSON.stringify({ platforms, settings }, null, 2)], {
+      type: 'application/json',
+    });
 
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
@@ -181,7 +194,7 @@ export default function AdminPage() {
 
     const reader = new FileReader();
 
-    reader.onload = () => {
+    reader.onload = async () => {
       try {
         const parsed = JSON.parse(String(reader.result));
 
@@ -202,7 +215,7 @@ export default function AdminPage() {
           visible: item.visible !== false,
         }));
 
-        const savedPlatforms = savePlatforms(normalized);
+        const savedPlatforms = await savePlatforms(normalized);
 
         if (!savedPlatforms) {
           setSaveError('تعذر استيراد البيانات.');
@@ -216,11 +229,11 @@ export default function AdminPage() {
             importedSettings.columns === 4 ||
             importedSettings.columns === 5)
         ) {
-          savePortalSettings({ columns: importedSettings.columns });
+          await savePortalSettings({ columns: importedSettings.columns });
           setSettings({ columns: importedSettings.columns });
         }
 
-        refreshPlatforms(normalized);
+        await refreshPlatforms(normalized);
         setEditingPlatform(undefined);
         setSaveError('');
       } catch {
@@ -232,14 +245,59 @@ export default function AdminPage() {
     event.target.value = '';
   }
 
-  function handleReset() {
-    localStorage.removeItem('nauss_portal_platforms');
-    localStorage.removeItem('nauss_portal_settings');
-    seedDefaultPlatforms();
-    seedPortalSettings();
-    const defaults = getPlatforms();
-    refreshPlatforms(defaults);
-    setSettings(getPortalSettings());
+  async function handleReset() {
+    const resetPlatforms = await savePlatforms([
+      {
+        id: '1',
+        name: 'منصة التدريب LMS',
+        description: 'البوابة الرئيسية للتدريب الإلكتروني',
+        url: 'https://example.com/lms',
+        icon: 'https://api.iconify.design/mdi:school.svg?color=%23016564',
+        visible: true,
+      },
+      {
+        id: '2',
+        name: 'منصة إقفال الدورات',
+        description: 'إدارة إقفال واعتماد الدورات التدريبية',
+        url: 'https://example.com/closure',
+        icon: 'https://api.iconify.design/mdi:clipboard-check.svg?color=%23016564',
+        visible: true,
+      },
+      {
+        id: '3',
+        name: 'منصة مخزون التدريب',
+        description: 'إدارة العهد والمواد والمخزون التدريبي',
+        url: 'https://example.com/inventory',
+        icon: 'https://api.iconify.design/mdi:package-variant-closed.svg?color=%23016564',
+        visible: true,
+      },
+      {
+        id: '4',
+        name: 'منصة الجدول الأسبوعي',
+        description: 'متابعة جدول الدورات والبرامج الأسبوعية',
+        url: 'https://example.com/schedule',
+        icon: 'https://api.iconify.design/mdi:calendar-clock.svg?color=%23016564',
+        visible: true,
+      },
+      {
+        id: '5',
+        name: 'منصة رسائل الواتساب',
+        description: 'إدارة الرسائل والتنبيهات وقوالب التواصل',
+        url: 'https://example.com/whatsapp',
+        icon: 'https://api.iconify.design/mdi:whatsapp.svg?color=%23016564',
+        visible: true,
+      },
+    ]);
+
+    const resetSettings = await savePortalSettings({ columns: 4 });
+
+    if (!resetPlatforms || !resetSettings) {
+      setSaveError('تعذر استعادة الإعدادات الافتراضية.');
+      return;
+    }
+
+    await refreshPlatforms();
+    setSettings({ columns: 4 });
     setEditingPlatform(undefined);
     setSaveError('');
   }
@@ -356,7 +414,7 @@ export default function AdminPage() {
 
           <div className="mb-6 rounded-[var(--radius)] border border-[rgba(208,178,132,0.25)] bg-[rgba(208,178,132,0.08)] px-[18px] py-4">
             <p className="text-[13px] text-[var(--text-secondary)]">
-              ملاحظة: جميع التغييرات تُحفظ محليًا في المتصفح. استخدم تصدير لحفظ نسخة احتياطية.
+              ملاحظة: جميع التغييرات تُحفظ في قاعدة البيانات وتظهر على جميع الأجهزة.
             </p>
           </div>
 

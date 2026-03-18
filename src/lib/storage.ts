@@ -1,14 +1,7 @@
 import { Platform, PortalSettings } from '@/types';
 
-const STORAGE_KEY = 'nauss_portal_platforms';
 const VISIT_KEY = 'nauss_portal_visits';
 const PLATFORM_VISITS_KEY = 'nauss_platform_visits';
-const PORTAL_SETTINGS_KEY = 'nauss_portal_settings';
-
-type RawPlatform = Partial<Platform> & {
-  title?: string;
-  customImage?: string;
-};
 
 const DEFAULT_PLATFORMS: Platform[] = [
   {
@@ -57,6 +50,11 @@ const DEFAULT_SETTINGS: PortalSettings = {
   columns: 4,
 };
 
+type RawPlatform = Partial<Platform> & {
+  title?: string;
+  customImage?: string;
+};
+
 function normalizePlatform(item: RawPlatform, index: number): Platform {
   return {
     id: String(item.id || `${Date.now()}-${index}`),
@@ -74,100 +72,110 @@ function normalizePlatforms(items: RawPlatform[]): Platform[] {
     .filter((item) => item.name);
 }
 
-export function getPlatforms(): Platform[] {
-  if (typeof window === 'undefined') return DEFAULT_PLATFORMS;
-
+export async function getPlatforms(): Promise<Platform[]> {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return DEFAULT_PLATFORMS;
+    const response = await fetch('/api/platforms', {
+      method: 'GET',
+      cache: 'no-store',
+    });
 
-    const parsed = JSON.parse(stored);
-    if (!Array.isArray(parsed)) return DEFAULT_PLATFORMS;
+    if (!response.ok) {
+      return DEFAULT_PLATFORMS;
+    }
 
-    return normalizePlatforms(parsed);
-  } catch {
+    const data = await response.json();
+    const platforms = Array.isArray(data?.platforms) ? data.platforms : DEFAULT_PLATFORMS;
+
+    return normalizePlatforms(platforms);
+  } catch (error) {
+    console.error('Failed to fetch platforms: - storage.ts:91', error);
     return DEFAULT_PLATFORMS;
   }
 }
 
-export function savePlatforms(platforms: Platform[]): boolean {
-  if (typeof window === 'undefined') return false;
-
+export async function savePlatforms(platforms: Platform[]): Promise<boolean> {
   try {
     const normalized = normalizePlatforms(platforms);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-    return true;
+
+    const response = await fetch('/api/platforms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ platforms: normalized }),
+    });
+
+    return response.ok;
   } catch (error) {
-    console.error('Failed to save platforms: - storage.ts:101', error);
+    console.error('Failed to save platforms: - storage.ts:110', error);
     return false;
   }
 }
 
-export function seedDefaultPlatforms(): void {
-  if (typeof window === 'undefined') return;
-
+export async function seedDefaultPlatforms(): Promise<void> {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PLATFORMS));
-      return;
-    }
+    const platforms = await getPlatforms();
 
-    const parsed = JSON.parse(stored);
-    if (!Array.isArray(parsed)) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PLATFORMS));
-      return;
+    if (!platforms.length) {
+      await savePlatforms(DEFAULT_PLATFORMS);
     }
-
-    const normalized = normalizePlatforms(parsed);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
   } catch (error) {
-    console.error('Failed to seed platforms: - storage.ts:125', error);
+    console.error('Failed to seed platforms: - storage.ts:123', error);
   }
 }
 
-export function getPortalSettings(): PortalSettings {
-  if (typeof window === 'undefined') return DEFAULT_SETTINGS;
-
+export async function getPortalSettings(): Promise<PortalSettings> {
   try {
-    const stored = localStorage.getItem(PORTAL_SETTINGS_KEY);
-    if (!stored) return DEFAULT_SETTINGS;
+    const response = await fetch('/api/settings', {
+      method: 'GET',
+      cache: 'no-store',
+    });
 
-    const parsed = JSON.parse(stored) as Partial<PortalSettings>;
-    const columns = parsed.columns;
+    if (!response.ok) {
+      return DEFAULT_SETTINGS;
+    }
+
+    const data = await response.json();
+    const settings = data?.settings as Partial<PortalSettings> | undefined;
+    const columns = settings?.columns;
 
     if (columns === 2 || columns === 3 || columns === 4 || columns === 5) {
       return { columns };
     }
 
     return DEFAULT_SETTINGS;
-  } catch {
+  } catch (error) {
+    console.error('Failed to fetch portal settings: - storage.ts:148', error);
     return DEFAULT_SETTINGS;
   }
 }
 
-export function savePortalSettings(settings: PortalSettings): boolean {
-  if (typeof window === 'undefined') return false;
-
+export async function savePortalSettings(settings: PortalSettings): Promise<boolean> {
   try {
-    localStorage.setItem(PORTAL_SETTINGS_KEY, JSON.stringify(settings));
-    return true;
+    const response = await fetch('/api/settings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ settings }),
+    });
+
+    return response.ok;
   } catch (error) {
-    console.error('Failed to save portal settings: - storage.ts:156', error);
+    console.error('Failed to save portal settings: - storage.ts:165', error);
     return false;
   }
 }
 
-export function seedPortalSettings(): void {
-  if (typeof window === 'undefined') return;
-
+export async function seedPortalSettings(): Promise<void> {
   try {
-    const stored = localStorage.getItem(PORTAL_SETTINGS_KEY);
-    if (!stored) {
-      localStorage.setItem(PORTAL_SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS));
+    const settings = await getPortalSettings();
+
+    if (![2, 3, 4, 5].includes(settings.columns)) {
+      await savePortalSettings(DEFAULT_SETTINGS);
     }
   } catch (error) {
-    console.error('Failed to seed portal settings: - storage.ts:170', error);
+    console.error('Failed to seed portal settings: - storage.ts:178', error);
   }
 }
 

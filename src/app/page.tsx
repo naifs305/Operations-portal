@@ -20,13 +20,20 @@ export default function HomePage() {
   const [columns, setColumns] = useState<2 | 3 | 4 | 5>(4);
 
   useEffect(() => {
-    seedDefaultPlatforms();
-    seedPortalSettings();
+    async function loadData() {
+      await seedDefaultPlatforms();
+      await seedPortalSettings();
 
-    setPlatforms(getPlatforms().filter((p) => p.visible !== false));
-    setColumns(getPortalSettings().columns);
-    incrementPortalVisit();
-    setVisits(getPortalVisits());
+      const loadedPlatforms = await getPlatforms();
+      const loadedSettings = await getPortalSettings();
+
+      setPlatforms(loadedPlatforms.filter((p) => p.visible !== false));
+      setColumns(loadedSettings.columns);
+      incrementPortalVisit();
+      setVisits(getPortalVisits());
+    }
+
+    loadData();
   }, []);
 
   return (
