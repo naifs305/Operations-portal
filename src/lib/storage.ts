@@ -5,6 +5,11 @@ const VISIT_KEY = 'nauss_portal_visits';
 const PLATFORM_VISITS_KEY = 'nauss_platform_visits';
 const PORTAL_SETTINGS_KEY = 'nauss_portal_settings';
 
+type RawPlatform = Partial<Platform> & {
+  title?: string;
+  customImage?: string;
+};
+
 const DEFAULT_PLATFORMS: Platform[] = [
   {
     id: '1',
@@ -52,6 +57,23 @@ const DEFAULT_SETTINGS: PortalSettings = {
   columns: 4,
 };
 
+function normalizePlatform(item: RawPlatform, index: number): Platform {
+  return {
+    id: String(item.id || `${Date.now()}-${index}`),
+    name: String(item.name || item.title || '').trim(),
+    description: String(item.description || '').trim(),
+    url: String(item.url || '').trim(),
+    icon: String(item.icon || item.customImage || '').trim(),
+    visible: item.visible !== false,
+  };
+}
+
+function normalizePlatforms(items: RawPlatform[]): Platform[] {
+  return items
+    .map((item, index) => normalizePlatform(item, index))
+    .filter((item) => item.name);
+}
+
 export function getPlatforms(): Platform[] {
   if (typeof window === 'undefined') return DEFAULT_PLATFORMS;
 
@@ -62,7 +84,7 @@ export function getPlatforms(): Platform[] {
     const parsed = JSON.parse(stored);
     if (!Array.isArray(parsed)) return DEFAULT_PLATFORMS;
 
-    return parsed;
+    return normalizePlatforms(parsed);
   } catch {
     return DEFAULT_PLATFORMS;
   }
@@ -72,10 +94,11 @@ export function savePlatforms(platforms: Platform[]): boolean {
   if (typeof window === 'undefined') return false;
 
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(platforms));
+    const normalized = normalizePlatforms(platforms);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
     return true;
   } catch (error) {
-    console.error('Failed to save platforms: - storage.ts:78', error);
+    console.error('Failed to save platforms: - storage.ts:101', error);
     return false;
   }
 }
@@ -87,9 +110,19 @@ export function seedDefaultPlatforms(): void {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PLATFORMS));
+      return;
     }
+
+    const parsed = JSON.parse(stored);
+    if (!Array.isArray(parsed)) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PLATFORMS));
+      return;
+    }
+
+    const normalized = normalizePlatforms(parsed);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
   } catch (error) {
-    console.error('Failed to seed platforms: - storage.ts:92', error);
+    console.error('Failed to seed platforms: - storage.ts:125', error);
   }
 }
 
@@ -120,7 +153,7 @@ export function savePortalSettings(settings: PortalSettings): boolean {
     localStorage.setItem(PORTAL_SETTINGS_KEY, JSON.stringify(settings));
     return true;
   } catch (error) {
-    console.error('Failed to save portal settings: - storage.ts:123', error);
+    console.error('Failed to save portal settings: - storage.ts:156', error);
     return false;
   }
 }
@@ -134,7 +167,7 @@ export function seedPortalSettings(): void {
       localStorage.setItem(PORTAL_SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS));
     }
   } catch (error) {
-    console.error('Failed to seed portal settings: - storage.ts:137', error);
+    console.error('Failed to seed portal settings: - storage.ts:170', error);
   }
 }
 
