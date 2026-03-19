@@ -18,19 +18,24 @@ export default function HomePage() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [visits, setVisits] = useState(0);
   const [columns, setColumns] = useState<2 | 3 | 4 | 5>(4);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
-      await seedDefaultPlatforms();
-      await seedPortalSettings();
+      try {
+        await seedDefaultPlatforms();
+        await seedPortalSettings();
 
-      const loadedPlatforms = await getPlatforms();
-      const loadedSettings = await getPortalSettings();
+        const loadedPlatforms = await getPlatforms();
+        const loadedSettings = await getPortalSettings();
 
-      setPlatforms(loadedPlatforms.filter((p) => p.visible !== false));
-      setColumns(loadedSettings.columns);
-      incrementPortalVisit();
-      setVisits(getPortalVisits());
+        setPlatforms(loadedPlatforms.filter((p) => p.visible !== false));
+        setColumns(loadedSettings.columns);
+        incrementPortalVisit();
+        setVisits(getPortalVisits());
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     loadData();
@@ -62,7 +67,23 @@ export default function HomePage() {
             </p>
           </div>
 
-          <PlatformsGrid platforms={platforms} columns={columns} />
+          {isLoading ? (
+            <div className={`grid grid-cols-2 gap-4 sm:gap-5 md:gap-6 ${columns === 2 ? 'md:grid-cols-2' : columns === 3 ? 'md:grid-cols-3' : columns === 4 ? 'md:grid-cols-3 lg:grid-cols-4' : 'md:grid-cols-3 lg:grid-cols-5'}`}>
+              {Array.from({ length: columns === 5 ? 5 : 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="min-h-[220px] rounded-[var(--radius-lg)] border border-[var(--border)] bg-white p-4 shadow-[var(--shadow-card)] sm:min-h-[250px] sm:p-5 lg:min-h-[270px]"
+                >
+                  <div className="mx-auto mb-4 h-[72px] w-[72px] animate-pulse rounded-full border border-[var(--border)] bg-[#f3f4f6] sm:h-[82px] sm:w-[82px] lg:h-[88px] lg:w-[88px]" />
+                  <div className="mx-auto mb-3 h-5 w-3/4 animate-pulse rounded bg-[#f3f4f6]" />
+                  <div className="mx-auto mb-2 h-4 w-5/6 animate-pulse rounded bg-[#f3f4f6]" />
+                  <div className="mx-auto h-4 w-2/3 animate-pulse rounded bg-[#f3f4f6]" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <PlatformsGrid platforms={platforms} columns={columns} />
+          )}
         </div>
       </main>
 
